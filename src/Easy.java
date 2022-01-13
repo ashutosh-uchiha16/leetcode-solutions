@@ -1390,19 +1390,26 @@ public class Easy {
 
     public int maxProfitII(int[] prices){
 
-        int n = prices.length - 1, buy = 0, sell = 0, profit = 0, i = 0;
-        while(i < n){
-            while(i < n && prices[i] >= prices[i + 1])
-                i++;
-            buy = prices[i];
+//        int n = prices.length - 1, buy = 0, sell = 0, profit = 0, i = 0;
+//        while(i < n){
+//            while(i < n && prices[i] >= prices[i + 1])
+//                i++;
+//            buy = prices[i];
+//
+//            while(i < n && prices[i] < prices[i+1])
+//                i++;
+//            sell = prices[i];
+//
+//            profit += (sell - buy);
+//        }
+//        return profit;
 
-            while(i < n && prices[i] < prices[i+1])
-                i++;
-            sell = prices[i];
-
-            profit += (sell - buy);
+        int maxProfit = 0;
+        for(int i = 1; i < prices.length; i++){
+            if(prices[i] > prices[i - 1])
+                maxProfit += prices[i] - prices[i - 1];
         }
-        return profit;
+        return maxProfit;
     }
 
     public static String removeDuplicates(String s){
@@ -1440,6 +1447,594 @@ public class Easy {
     public boolean rotateString(String s, String goal){
         return s.length() == goal.length() && (s + s).contains(goal);
     }
+
+    class Node {
+        public int val;
+        public List<Node> children;
+
+        public Node() {}
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val, List<Node> _children) {
+            val = _val;
+            children = _children;
+        }
+    };
+    public int maxDepth(Node root){
+
+        if(root == null)
+            return 0;
+
+        int depth = 0;
+        Queue<Node> q = new LinkedList<>();
+        q.offer(root);
+
+        while(!q.isEmpty()){
+            int size = q.size();
+
+            for(int i = 0; i < size; i++){
+                Node temp = q.poll();
+                for(Node curr: temp.children)
+                    q.offer(curr);
+            }
+            depth++;
+        }
+        return depth;
+    }
+    int result = 0;
+
+    public int findSum(TreeNode node){
+        if(node == null)
+            return 0;
+
+        int left = findSum(node.left);
+        int right = findSum(node.right);
+
+        result += Math.abs(left - right);
+
+        return left + right + node.val;
+    }
+    public int findTilt(TreeNode root){
+        findSum(root);
+        return result;
+    }
+
+    List<Integer> list4 = new ArrayList<>();
+    public void prefunc(Node node){
+        if(node == null)
+            return;
+        list4.add(node.val);
+        for(Node temp: node.children){
+            preorder(temp);
+        }
+    }
+    public List<Integer> preorder(Node root) {
+
+        prefunc(root);
+       return list4;
+    }
+    List<Integer> list3 = new ArrayList<>();
+    public void postfunc(Node node){
+        if(node == null)
+            return;
+
+        for(Node temp: node.children){
+            postorder(temp);
+        }
+        list3.add(node.val);
+
+    }
+    public List<Integer> postorder(Node root) {
+
+        postfunc(root);
+        return list3;
+    }
+
+    public boolean subtreeFunc(TreeNode p, TreeNode q){
+        if(p == null && q == null)
+            return true;
+
+        if(p == null || q == null)
+            return false;
+
+        if(p.val != q.val)
+            return false;
+
+        return subtreeFunc(p.left, q.left) && subtreeFunc(p.right, q.right);
+    }
+    public boolean isSubtree(TreeNode root, TreeNode subRoot){
+
+        if(root == null || subRoot == null)
+            return false;
+        if(subtreeFunc(root, subRoot))
+            return true;
+
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+
+    public List<Double> averageOfLevels(TreeNode root) {
+
+        List<Double> ans = new ArrayList<>();
+        Queue<TreeNode> q = new LinkedList<>();
+
+        if(root == null)
+            return ans;
+        q.offer(root);
+
+        while(!q.isEmpty()){
+
+            int size = q.size();
+            double sum = 0.0;
+
+            for(int i = 0; i < size; i++){
+                TreeNode temp = q.poll();
+                sum += temp.val;
+                if(temp.left != null)
+                    q.offer(temp.left);
+                if(temp.right != null)
+                    q.offer(temp.right);
+            }
+            ans.add(sum / size);
+
+        }
+
+        return ans;
+    }
+
+    public boolean helper(Set<Integer> set, TreeNode node, int k){
+        if(node == null)
+            return false;
+        if(set.contains(k - node.val))
+            return true;
+
+        set.add(node.val);
+
+        return helper(set, node.left, k) || helper(set, node.right, k);
+    }
+    public boolean findTarget(TreeNode root, int k) {
+
+        Set<Integer> set = new HashSet<>();
+
+        return helper(set, root, k);
+
+    }
+
+    int ans = Integer.MAX_VALUE;
+    TreeNode temp = null;
+
+    public void inorder(TreeNode root){
+        if(root == null)
+            return;
+
+        inorder(root.left);
+        if(temp != null)
+            ans = Math.min(ans, Math.abs(root.val - temp.val));
+
+        temp = root;
+
+        inorder(root.right);
+    }
+
+    public int getMinimumDifference(TreeNode root) {
+
+        inorder(root);
+        return ans;
+    }
+
+    int ans1 = Integer.MAX_VALUE, temp1 = 0;
+    public int minDiffInBST(TreeNode root){
+        if(root.left != null)
+            minDiffInBST(root.left);
+
+        if(temp1 != 0)
+            ans = Math.min(ans, root.val - temp1);
+        temp1 = root.val;
+
+        if(root.right != null)
+            minDiffInBST(root.right);
+
+        return ans1;
+    }
+
+    public int helper(Stack<TreeNode> s){
+        while(true){
+            TreeNode temp = s.pop();
+            if(temp.left != null)
+                s.push(temp.left);
+            if(temp.right != null)
+                s.push(temp.right);
+            if(temp.left == null && temp.right == null)
+                return temp.val;
+        }
+    }
+
+    public boolean leafSimilar(TreeNode root1, TreeNode root2) {
+
+        Stack<TreeNode> s1 = new Stack<>(), s2 = new Stack<>();
+
+        s1.push(root1);
+        s2.push(root2);
+
+        while(!s1.isEmpty() && !s2.isEmpty()){
+            if(helper(s1) != helper(s2))
+                return false;
+        }
+
+        return s1.isEmpty() && s2.isEmpty();
+    }
+
+    TreeNode prev = null, new_head = null;
+    public TreeNode increasingBST(TreeNode root){
+
+        if(root == null)
+            return null;
+
+        if(root.left != null)
+            increasingBST(root.left);
+
+        if(prev != null){
+            root.left  = null;
+            prev.right = root;
+        }
+        if(new_head == null)
+            new_head = root;
+
+        prev = root;
+
+        if(root.right != null)
+            increasingBST(root.right);
+
+        return new_head;
+    }
+
+    public int distanceBetweenBusStops(int[] distance, int start, int destination) {
+
+        if(start > destination){
+            int temp = start;
+            start = destination;
+            destination = temp;
+        }
+        int total = 0, ans = 0;
+        for(int i = 0; i < distance.length; i++){
+
+            if(i >= start && i < destination)
+                ans += distance[i];
+            total += distance[i];
+        }
+
+        return Math.min(ans, total - ans);
+    }
+
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+
+        Map<Integer, Integer> map = new HashMap<>();
+        Stack<Integer> stack = new Stack<>();
+        for(int num: nums2){
+
+            while(!stack.isEmpty() && stack.peek() < num)
+                map.put(stack.pop(), num);
+            stack.push(num);
+        }
+
+        for(int i =0; i < nums1.length; i++){
+            nums1[i] = map.getOrDefault(nums1[i], -1);
+        }
+
+        return nums1;
+    }
+
+    public int[] nextGreaterElements(int[] nums) {
+
+        int n = nums.length, ans[] = new int[n];
+        Arrays.fill(ans, -1);
+
+        Stack<Integer> stack = new Stack<>();
+        for(int i =0; i < n * 2; i++){
+            int temp = nums[i % n];
+            while(!stack.isEmpty() && nums[stack.peek()] < temp)
+                ans[stack.pop()] = temp;
+            if(i < n)
+                stack.push(i);
+        }
+
+        return ans;
+    }
+
+    public boolean buddyStrings(String s, String goal){
+        if(s.length() != goal.length())
+            return false;
+
+        if(s.equals(goal)){
+            Set<Character> set = new HashSet<>();
+            for(char ch: s.toCharArray())
+                set.add(ch);
+
+            if(set.size() < s.length())
+                return true;
+            else
+                return false;
+        }
+        List<Integer> diff = new ArrayList<>();
+        for(int i = 0; i < s.length(); i++){
+            if(s.charAt(i) != goal.charAt(i))
+                diff.add(i);
+        }
+
+        if(diff.size() == 2 && s.charAt(diff.get(0)) == goal.charAt(diff.get(1)) && s.charAt(diff.get(1)) == goal.charAt(diff.get(0)))
+            return true;
+        else
+            return false;
+
+
+    }
+
+    public boolean lemonadeChange(int[] bills) {
+            int fives = 0, tens = 0;
+            for(int i: bills){
+                if(i == 5)
+                    fives++;
+                else if(i == 10){
+                    fives--;
+                    tens++;
+                } else if(tens > 0){
+                    tens--;
+                    fives--;
+                } else
+                    fives -= 3;
+
+                if(fives < 0)
+                    return false;
+            }
+            return true;
+    }
+
+    public int minCostClimbingStairs(int[] cost) {
+
+        //If modifying array is allowed
+//        for(int i = 2; i < cost.length; i++){
+//            cost[i] = Math.min(cost[i - 1], cost[i - 2]);
+//        }
+//
+//        return Math.min(cost[cost.length - 1], cost[cost.length - 2]);
+
+        //if cost can't be modified
+//        int step0 = cost[0], step1 = cost[1], temp;
+//
+//        for(int i = 2; i < cost.length; i++){
+//            temp = Math.min(step1, step0) + cost[i];
+//            step0 = step1;
+//            step1 = temp;
+//        }
+//
+//        return Math.min(step0, step1);
+
+        //DP
+        int n = cost.length;
+        int[] ans = new int[n];
+
+        for(int i = 0; i < n; i++){
+            if(i < 2)
+                ans[i] = cost[i];
+            else
+                ans[i] = cost[i] + Math.min(ans[i - 1], ans[ i - 2]);
+        }
+        return Math.min(ans[n - 1], ans[n - 2]);
+    }
+
+    public int smallestRangeI(int[] nums, int k) {
+
+        int min = nums[0], max = nums[0];
+        for(int i = 0; i < nums.length; i++){
+            min = Math.min(min, nums[i]);
+            max = Math.max(max, nums[i]);
+        }
+
+        return (min + k >= max - k) ? 0: (max - k) - (min + k);
+    }
+
+    public void update_color(int[][] image, int i, int j, int fill, int original){
+
+        if(i < 0 || j < 0 || i >= image.length || j >= image[0].length || image[i][j] == fill || image[i][j] != original)
+            return;
+        image[i][j] = fill;
+
+        update_color(image, i - 1, j, fill, original);
+        update_color(image, i + 1, j, fill, original);
+        update_color(image, i, j - 1, fill, original);
+        update_color(image, i, j + 1, fill, original);
+    }
+
+    public int[][] floodFill(int[][] image, int sr, int sc, int newColor){
+        int original = image[sr][sc];
+
+        update_color(image, sr, sc, newColor, original);
+
+        return image;
+    }
+    TreeNode xPar = null, yPar = null;
+    int xDep = -1, yDep = -1;
+
+    public void getParentDepth(TreeNode node, int x, int y, int depth, TreeNode parent){
+        if(node == null)
+            return;
+        if(node.val == x){
+            xDep = depth;
+            xPar = parent;
+        }
+
+        if(node.val == y){
+            yDep = depth;
+            yPar = parent;
+        }
+
+        getParentDepth(node.left, x, y, depth + 1, node);
+        getParentDepth(node.right, x, y, depth + 1, node);
+    }
+    public boolean isCousins(TreeNode root, int x, int y){
+
+        getParentDepth(root, x, y, 0, null);
+
+        return xPar != yPar && xDep == yDep;
+    }
+
+    public int[] countBits(int n){
+
+        if(n == 0) return new int[1];
+
+        int[] ans = new int[n + 1];
+        ans[0] = 0;
+        ans[1] = 1;
+
+        for(int i = 2; i <= n; i++){
+            if(i % 2 == 0)
+                ans[i] = ans[i / 2];
+            else
+                ans[i] = ans[i/2] + 1;
+        }
+
+        return ans;
+    }
+
+    public int tribonacci(int n){
+        int[] ans = {0, 1, 1};
+        for(int i = 3; i <= n; i++){
+            ans[i % 3] = ans[0] + ans[1] + ans[2];
+        }
+        return ans[n % 3];
+    }
+
+    public boolean isSubsequence(String s, String t){
+        if(s.length() == 0)
+            return true;
+        int sIndex = 0, tIndex = 0;
+        while(tIndex < t.length()){
+            if(s.charAt(sIndex) == t.charAt(tIndex)) {
+                sIndex++;
+                if(sIndex == s.length())
+                    return true;
+            }
+            tIndex++;
+        }
+        return false;
+    }
+
+    public int[][] matrixReshape(int[][] mat, int r, int c) {
+
+//        int m = mat.length, n = mat[0].length;
+//
+//        if((m * n) != (r * c))
+//            return mat;
+//
+//        int[][] ans = new int[r][c];
+//        int row = 0, col = 0;
+//        for(int i = 0; i < m; i++){
+//            for(int j = 0; j < n; j++){
+//                ans[row][col] = mat[i][j];
+//                col++;
+//                if(col == c){
+//                    col = 0;
+//                    row++;
+//                }
+//            }
+//        }
+//        return ans;
+
+        int m = mat.length, n = mat[0].length;
+        if((m * n) != (r * c))
+            return mat;
+        int[][] ans = new int[r][c];
+
+        for(int i = 0; i < (m * n); i++){
+            ans[i / c][i % c] = mat[i / n][i % n];
+        }
+        return ans;
+    }
+
+    public int maxProduct(int[] nums) {
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+
+        for(int i: nums)
+            pq.add(i);
+
+        return (pq.poll() - 1) * (pq.poll() - 1);
+    }
+
+    public int lastStoneWeight(int[] stones) {
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a,b) -> b - a);
+
+        int n = stones.length;
+        for(int a: stones)
+            pq.offer(a);
+
+//        while(pq.size() > 1)
+//            pq.offer(pq.poll() - pq.poll());
+//
+//        return pq.poll();
+
+        int x, y;
+        while(n > 1){
+            y = pq.remove();
+            x = pq.remove();
+
+            if(x == y)
+                n -= 2;
+            else {
+                pq.add(y - x);
+                n--;
+            }
+        }
+
+        return (pq.isEmpty() ? 0 : pq.peek());
+    }
+
+    int max = 0;
+    private int maxDepth1(TreeNode node){
+        if(node == null)
+            return 0;
+
+        int left = maxDepth1(node.left);
+        int right = maxDepth1(node.right);
+
+        max = Math.max(max, left + right);
+
+        return Math.max(left, right) + 1;
+    }
+    public int diameterOfBinaryTree(TreeNode root) {
+        maxDepth1(root);
+        return max;
+    }
+
+    public int[] buildArray(int[] nums){
+
+        // naive approach
+        int[] ans = new int[nums.length];
+
+        for(int i = 0; i < nums.length; i++){
+            ans[i] = nums[nums[i]];
+        }
+        return ans;
+
+        // optimized approach O(1) space
+
+
+    }
+    public int[] runningSum(int[] nums) {
+
+        int sum[] = new int[nums.length];
+        int s = 0;
+        for(int i = 0; i < nums.length; i++){
+            sum[i] = s + nums[i];
+            s = sum[i];
+        }
+
+        return sum;
+    }
+
     public static void main(String[] args) {
 
 //        int[] nums = {2,7,11,15};
@@ -1469,6 +2064,7 @@ public class Easy {
         //System.out.println(new Easy().generate(5));
 //        String[] words = {"bella", "label", "roller"};
 //        System.out.println(new Easy().commonChars(words));
-        System.out.println(removeDuplicates("abbaca"));
+        //System.out.println(removeDuplicates("abbaca"));
+        //System.out.println(new Easy().isAlienSorted(new String[]{"word, world, row"}, "worldabcefghijkmnpqstuvxyz"));
     }
 }
