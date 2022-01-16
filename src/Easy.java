@@ -2035,6 +2035,70 @@ public class Easy {
         return sum;
     }
 
+    public int maximumWealth(int[][] accounts) {
+
+        int maxWealth = 0;
+
+        for(int[] account: accounts){
+
+            int currWealth = 0;
+            for(int money: account){
+                currWealth += money;
+            }
+            maxWealth = Math.max(maxWealth, currWealth);
+        }
+
+        return maxWealth;
+    }
+
+    public int[] shuffle(int[] nums, int n){
+        int[] ans = new int[2*n];
+
+        int i = 0, j = n, k = 0;
+        while(i < 2*n && j < 2*n){
+            if(k % 2 == 0){
+                ans[k] = nums[i++];
+            } else{
+                ans[k] = nums[j++];
+            }
+            k++;
+        }
+        return ans;
+    }
+
+    public List<Boolean> kidsWithCandies(int[] candies, int extraCandies){
+
+        List<Boolean> ans = new ArrayList<>();
+        int max = 0;
+        for(int candy: candies)
+            max = Math.max(max, candy);
+
+        for(int candy: candies){
+
+
+            if(candy + extraCandies >= max)
+                ans.add(true);
+            else
+                ans.add(false);
+
+        }
+        return ans;
+    }
+
+    public int numIdenticalPairs(int[] nums){
+
+        int[] count = new int[101];
+
+        for(int num: nums){
+            count[num]++;
+        }
+        int ans = 0;
+        for(int n: count){
+            ans += (n * (n-1) /2);
+        }
+        return ans;
+    }
+
     public static void main(String[] args) {
 
 //        int[] nums = {2,7,11,15};

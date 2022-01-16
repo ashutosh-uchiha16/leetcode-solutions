@@ -202,6 +202,8 @@ public class Medium {
 
         return maxArea;
 
+
+
     }
 
     public String intToRoman(int num) {
@@ -351,7 +353,8 @@ public class Medium {
             }
         }
         return -1;
-    }
+
+            }
 
     public int[] searchRange(int[] nums, int target) {
         if (nums == null || nums.length == 0)
@@ -1409,37 +1412,37 @@ public class Medium {
 
     }
 
-    public void swap(int[] nums, int i, int j) {
-        int temp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = temp;
-    }
-
-    public void reversePer(int[] nums, int start) {
-        int i = start, j = nums.length - 1;
-        while (i < j) {
-            swap(nums, i, j);
-            i++;
-            j--;
-        }
-    }
-
     public void nextPermutation(int[] nums) {
 
-        if (nums == null || nums.length <= 1)
+
+        if(nums == null || nums.length <= 1)
             return;
 
         int i = nums.length - 2;
-        while (i >= 0 && nums[i] >= nums[i + 1])
+        while(i >= 0 && nums[i] >= nums[i + 1])
             i--;
 
         if (i >= 0) {
             int j = nums.length - 1;
-            while (nums[i] >= nums[j])
+            while(nums[i] >= nums[j])
                 j--;
             swap(nums, i, j);
         }
-        reversePer(nums, i + 1);
+        reverse(nums, i + 1);
+    }
+
+    public void swap(int[] nums, int i, int j){
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    public  void reverse(int[] nums, int start){
+        int i =  start, j = nums.length - 1;
+        while(i < j){
+            swap(nums, i, j);
+            i++;
+            j--;
+        }
     }
 
     public void backtrackCombinations(List<List<Integer>> ans, List<Integer> list, int[] candidates, int remains, int idx) {
@@ -3290,7 +3293,234 @@ public class Medium {
 //
 //    }
 
+    public static boolean wordSearchHelper(char[][] board, String word, int wordPosition, int rI, int cI){
 
+        // if the word is searched completely
+        if(word.length() == wordPosition)
+            return true;
+
+        // out of boundary conditions
+        if(rI < 0 || rI >= board.length || cI < 0 || cI >= board[rI].length)
+            return false;
+
+        // storing the board value at that particular index
+        char temp = board[rI][cI];
+
+        if(temp == '#')
+            return false;
+
+        if(temp != word.charAt(wordPosition))
+            return false;
+
+        board[rI][cI] = '#';
+
+        boolean top =  wordSearchHelper(board, word, wordPosition + 1, rI + 1, cI);
+        boolean bottom =  wordSearchHelper(board, word, wordPosition + 1, rI - 1, cI);
+        boolean left =  wordSearchHelper(board, word, wordPosition + 1, rI, cI +  1);
+        boolean right =  wordSearchHelper(board, word, wordPosition + 1, rI, cI - 1);
+
+
+        board[rI][cI] = temp;
+
+        return top || bottom || left || right;
+    }
+    public static boolean exist(char[][] board, String word) {
+
+        int rows = board.length, cols = board[0].length;
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                if(board[i][j] == word.charAt(0)){
+                    if(wordSearchHelper(board, word, 0, i, j )){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public int[] productExceptSelf(int[] nums){
+
+        int n = nums.length;
+        int[] ans = new int[n];
+
+        ans[0] = 1;
+        for(int i = 1; i < n; i++){
+            ans[i] = ans[i-1] * nums[i-1];
+        }
+
+        int temp = 1;
+        for(int i = n-1; i >= 0; i--){
+            ans[i] = ans[i] * temp;
+            temp *= nums[i];
+        }
+        return ans;
+    }
+
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+
+        // we have to go in the clockwise direction
+        // cost of going to the next station should be less than the gas tank
+
+        int tankCapacity = 0, idx = 0, tempTank = 0;
+        for(int i = 0; i < gas.length; i++){
+
+            tempTank += gas[i] - cost[i];
+
+            if(tempTank < 0){
+                idx = i + 1;
+                tempTank = 0;
+            }
+
+            tankCapacity += gas[i] - cost[i];
+        }
+        return tankCapacity >= 0 ? idx: -1;
+    }
+
+//    public List<List<Integer>> twoSumHelper(int[] nums, int target, int start){
+//
+//        List<List<Integer>> ans = new ArrayList<>();
+//        int low = start, high = nums.length - 1;
+//        while(low < high){
+//            int curr = nums[low] + nums[high];
+//            if(curr < target || (low > start && nums[low] == nums[low - 1]) ){
+//                low++;
+//            } else if(curr > target || (high < nums.length - 1  && nums[high] == nums[high + 1]) ){
+//                high--;
+//            } else{
+//                ans.add(Arrays.asList(nums[low], nums[high]) );
+//                low++;
+//                high--;
+//            }
+//        }
+//        return ans;
+//    }
+    public static List<List<Integer>> fourSum(int[] nums, int target) {
+
+        List<List<Integer>> ans = new ArrayList<>();
+        int n = nums.length;
+        if(n < 4)
+            return ans;
+        Arrays.sort(nums);
+//        int sec = 0, third = 0, fourth = 0;
+        for(int i = 0; i < n - 3; i++){
+            if(i > 0 && nums[i] == nums[i-1])
+                continue;
+            for(int j = i + 1; j < n - 2; j++){
+
+                if(j > i + 1 && nums[j] == nums[j - 1])
+                    continue;;
+                int rem = target - (nums[i] + nums[j]);
+                int low = j + 1, high = n - 1;
+                while(low < high){
+                    int curr = nums[low] + nums[high];
+
+                    if(curr < rem){
+                        low++;
+                        while(low < high && nums[low] == nums[low - 1])
+                            low++;
+                    }
+
+                    else if(curr > rem){
+                        high--;
+                        while(high > low && nums[high] == nums[high + 1])
+                            high--;
+                    }
+
+                    else{
+                        ans.add(Arrays.asList(nums[i], nums[j], nums[low], nums[high]));
+
+                        while(++low <= high && nums[low] == nums[low - 1])
+                            continue;
+                        while(--high >= low && nums[high] == nums[high + 1])
+                            continue;
+                    }
+                }
+
+            }
+
+        }
+        return ans;
+    }
+
+    public int singleNonDuplicate(int[] nums){
+        int left = 0, right = nums.length - 1;
+
+        while(left < right){
+
+            int mid = left + (right - left)/ 2;
+            if(mid % 2 == 0 && nums[mid] == nums[mid + 1] || mid % 2 != 0 && nums[mid] == nums[mid - 1])
+                left = mid + 1;
+            else
+                right = mid;
+        }
+        return nums[left];
+    }
+    private int state_live = 1;
+    private int state_dead = 0;
+    private int transition_live_dead = -1;
+    private int transition_dead_live = -2;
+
+    public int checkLiveNeighbors(int[][] board, int r, int c){
+        int lives = 0;
+        int[][] DIRS = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+
+        for(int[] d: DIRS){
+            int x = r + d[0];
+            int y = c + d[1];
+
+            if(x >= 0 && y >= 0 && x < board.length && y < board[0].length){
+
+                if(board[x][y] == 1 || board[x][y] == transition_live_dead){
+                    // System.out.println("Got it: " + x+y);
+                    lives++;
+                }
+            }
+
+        }
+        return lives;
+    }
+
+    public void doTransition(int[][] board){
+
+        for(int i = 0; i < board.length; i++){
+            for(int j = 0; j < board[0].length; j++){
+                if(board[i][j] == transition_live_dead)
+                    board[i][j] = state_dead;
+                if(board[i][j] == transition_dead_live)
+                    board[i][j] = state_live;
+            }
+        }
+    }
+
+    public int calculateNextStep(int[][] board, int i, int j){
+        int lives = checkLiveNeighbors(board, i, j);
+        //System.out.println(lives);
+        if((board[i][j] == state_live || board[i][j] == transition_live_dead) && (lives < 2 || lives > 3))
+            return transition_live_dead;
+        if((board[i][j] == state_dead  || board[i][j] == transition_dead_live) && ( lives == 3))
+            return transition_dead_live;
+
+        return board[i][j];
+    }
+
+    public void gameOfLife(int[][] board){
+
+        if(board == null || board.length == 0)
+            return;
+        int m = board.length, n = board[0].length;
+
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                board[i][j] = calculateNextStep(board, i, j);
+
+
+            }
+        }
+
+        doTransition(board);
+
+    }
     public static void main(String[] args) {
 
         //System.out.println(convert("PAYPALISHIRING", 3));
@@ -3317,6 +3547,7 @@ public class Medium {
         //System.out.println(new Medium().leastInterval(new char[]{'A', 'A', 'A', 'B', 'B', 'B'}, 2));
        // System.out.println(new Medium().longestStrChain(new String[]{"a","b","ba","bca","bda","bdca"}));
         //System.out.println(new Medium().findTargetSumWays(new int[]{1,1,1,1,1}, 3));
-
+        //System.out.println(fourSum(new int[]{-9,4,0,-3,6,3,-3,-9,-7,1,0,-7,-8,7,1}, -9));
+        System.out.println((-2 >> 2));
     }
 }
